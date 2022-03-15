@@ -86,5 +86,33 @@ def instructions(id):
     data = {
         "id":id
     }
-    Recipe.one_recipe(data)
-    return render_template("instructions.html")
+    user_data = {
+        "id":session['user_id']
+    }
+    return render_template("instructions.html", user=User.get_by_id(user_data), recipe=Recipe.one_recipe(data))
+
+
+@app.route('/edit/<int:id>')
+def edit_recipe(id):
+    if 'user_id' not in session:
+        return redirect('/logout')
+    data = {
+        "id":id
+    }
+    return render_template("edit_recipes.html",edit=Recipe.one_recipe(data))
+
+@app.route('/update/recipe',methods=['POST'])
+def update_recipe():
+    if 'user_id' not in session:
+        return redirect('/logout')
+    if not Recipe.validate_recipe(request.form):
+        return redirect('/recipes/new')
+    data = {
+        "name": request.form["name"],
+        "description": request.form["description"],
+        "instructions": request.form["instructions"],
+        "id": request.form['id']
+    }
+    print(request.form["id"])
+    Recipe.update_recipe(data)
+    return redirect('/dashboard')

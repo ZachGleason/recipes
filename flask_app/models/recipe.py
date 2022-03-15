@@ -1,4 +1,5 @@
 from flask_app.config.mysqlconnection import connectToMySQL
+from flask import flash
 
 class Recipe:
     def __init__(self,data):
@@ -15,19 +16,38 @@ class Recipe:
     @classmethod
     def get_all_recipes(cls,data):
         query = "SELECT * FROM recipes;"
-        return connectToMySQL("recipes").query_db(query, data)
+        results = connectToMySQL("recipes").query_db(query, data)
+        all_recipes = []
+        for row in results:
+            all_recipes.append( cls(row) )
+        return all_recipes
 
     @classmethod
     def one_recipe(cls,data):
         query = "SELECT * FROM recipes WHERE id = %(id)s;"
-        return connectToMySQL("recipes").query_db(query, data)
+        results = connectToMySQL("recipes").query_db(query, data)
+        return cls( results[0] )
 
     @classmethod
     def update_recipe(cls,data):
-        query = "UPDATE recipes SET name =  %(name)s, description = %(description)s, instructions = %(instructions)s WHERE id = %(id)s;"
+        query = "UPDATE recipes SET name=%(name)s, description=%(description)s, instructions=%(instructions)s WHERE id=%(id)s;"
         return connectToMySQL("recipes").query_db(query, data)
 
     @classmethod
     def delete_recipe(cls,data):
         query = "DELETE FROM recipes WHERE id = %(id)s;"
         return connectToMySQL("recipes").query_db(query, data)
+
+    @staticmethod
+    def validate_recipe(recipe):
+        is_valid = True
+        if len(recipe['name']) < 3:
+            is_valid = False
+            flash("Name must be at least 3 characters","recipe")
+        if len(recipe['instructions']) < 3:
+            is_valid = False
+            flash("Instructions must be at least 3 characters","recipe")
+        if len(recipe['description']) < 3:
+            is_valid = False
+            flash("Description must be at least 3 characters","recipe")
+        return is_valid
