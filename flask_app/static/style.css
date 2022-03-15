@@ -73,3 +73,20 @@ margin: auto;
     border: 1px solid black;
     background-color: rgb(219, 196, 166);
 }
+
+
+#register {
+    text-align: center;
+}
+
+#button3 {
+    margin-left: 600px;
+}
+
+#account {
+    text-align: center;
+}
+
+#button4 {
+    margin-left: 620px;
+}
